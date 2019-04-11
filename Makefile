@@ -2,7 +2,7 @@ LINK:=$(CXX)
 
 DEFS=-DBOOST_SPIRIT_THREADSAFE
 
-DEFS += $(addprefix -I,$(CURDIR) $(CURDIR)/rsm $(CURDIR)/rsm/experimental $(CURDIR)/rsm/test $(BOOST_INCLUDE_PATH))
+DEFS += $(addprefix -I,$(CURDIR) $(CURDIR)/rsm $(CURDIR)/rsm/experimental $(CURDIR)/rsm/test $(CURDIR)/rsm/test/experimental $(BOOST_INCLUDE_PATH))
 LIBS = $(addprefix -L,$(BOOST_LIB_PATH))
 
 LIBS += \
@@ -22,6 +22,9 @@ BUILD= \
     build/rsm/test/rsm_promotion_tests.o \
     build/rsm/test/rsm_simple_tests.o \
     build/rsm/test/rsm_starvation_tests.o \
+	build/rsm/test/experimental/exp_rsm_promotion_tests.o \
+    build/rsm/test/experimental/exp_rsm_simple_tests.o \
+    build/rsm/test/experimental/exp_rsm_starvation_tests.o \
     build/rsm/test/test_cxx_rsm.o \
     build/rsm/test/timer.o
 
@@ -41,6 +44,9 @@ directories:
 	fi; \
 	if [ ! -d "$(CURDIR)/build/rsm/test" ]; then \
 		mkdir $(CURDIR)/build/rsm/test; \
+	fi;
+	if [ ! -d "$(CURDIR)/build/rsm/test/experimental" ]; then \
+		mkdir $(CURDIR)/build/rsm/test/experimental; \
 	fi;
 
 build/%.o: %.cpp
