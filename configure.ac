@@ -1,7 +1,7 @@
 AC_PREREQ(2.60)
 define(_CLIENT_VERSION_MAJOR, 1)
 define(_CLIENT_VERSION_MINOR, 0)
-define(_CLIENT_VERSION_REVISION, 0)
+define(_CLIENT_VERSION_REVISION, 1)
 AC_INIT([Recursive Shared Mutex],m4_join([.],_CLIENT_VERSION_MAJOR,_CLIENT_VERSION_MINOR,_CLIENT_VERSION_REVISION),[https://github.com/Greg-Griffith/cxx_recursive_shared_mutex/issues],[RSM])
 AC_CONFIG_SRCDIR([lib/recursive_shared_mutex.cpp])
 AC_CONFIG_AUX_DIR([build-aux])
