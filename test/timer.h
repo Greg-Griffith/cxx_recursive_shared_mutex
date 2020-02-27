@@ -15,7 +15,4 @@ std::chrono::steady_clock::time_point GetTimeNow();
 
 int64_t GetDuration(std::chrono::steady_clock::time_point start, std::chrono::steady_clock::time_point end);
 
-
-void MilliSleep(int64_t n);
-
 #endif // TIMER_H
