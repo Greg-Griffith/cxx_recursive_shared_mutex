@@ -6,6 +6,8 @@
 #ifndef TEST_CXX_RSM_H
 #define TEST_CXX_RSM_H
 
+#include <atomic>
+
 struct TestSetup {
     TestSetup()   { /* intentionally left blank */ }
     ~TestSetup()  { /* intentionally left blank */ }
