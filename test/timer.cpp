@@ -6,19 +6,17 @@
 #include "timer.h"
 
 #include <atomic>
+#include <ratio>
 
-#include <boost/date_time/posix_time/posix_time.hpp>
-#include <chrono>
 #include <thread>
 
-int64_t GetTimeMillis()
+std::chrono::steady_clock::time_point GetTimeNow()
 {
-    std::chrono::milliseconds ms = std::chrono::duration_cast< std::chrono::milliseconds >(
-        std::chrono::system_clock::now().time_since_epoch());
-    return std::chrono::duration<int64_t, std::milli>(ms).count();
+    std::chrono::steady_clock::now();
 }
 
-void MilliSleep(int64_t n)
+int64_t GetDuration(std::chrono::steady_clock::time_point start, std::chrono::steady_clock::time_point end)
 {
-    std::this_thread::sleep_for(std::chrono::milliseconds(n));
+    std::chrono::duration<int64_t, std::micro> time_span = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    return time_span.count();
 }

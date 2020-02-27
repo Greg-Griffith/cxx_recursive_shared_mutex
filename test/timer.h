@@ -6,10 +6,13 @@
 #ifndef TIMER_H
 #define TIMER_H
 
+#include <chrono>
+#include <inttypes.h>
 #include <stdint.h>
 #include <string>
 
-int64_t GetTimeMillis();
-void MilliSleep(int64_t n);
+std::chrono::steady_clock::time_point GetTimeNow();
+
+int64_t GetDuration(std::chrono::steady_clock::time_point start, std::chrono::steady_clock::time_point end);
 
 #endif // TIMER_H
