@@ -3,15 +3,15 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "recursive_shared_mutex.h"
-#include "test_cxx_rsm.h"
-#include "timer.h"
+#include "lightweight_recursive_shared_mutex.h"
+#include "test/test_cxx_rsm.h"
+#include "test/timer.h"
 
 #include <boost/test/unit_test.hpp>
 
-BOOST_FIXTURE_TEST_SUITE(rsm_simple_tests, TestSetup)
+BOOST_FIXTURE_TEST_SUITE(lw_simple_tests, TestSetup)
 
-recursive_shared_mutex rsm;
+lightweight_recursive_shared_mutex rsm;
 
 void rsm_lock_unlock()
 {
@@ -195,7 +195,7 @@ BOOST_AUTO_TEST_CASE(rsm_simple_tests_perf)
     }
     std::chrono::steady_clock::time_point endTime_1 = GetTimeNow();
     int64_t duration_1 = GetDuration(startTime_1, endTime_1);
-    printf("rsm_lock_unlock took %" PRId64 " microseconds \n", duration_1);
+    printf("LW lock_unlock took %" PRId64 " microseconds \n", duration_1);
 
     std::chrono::steady_clock::time_point startTime_2 = GetTimeNow();
     for (run = 0; run < 100000; ++run)
@@ -204,7 +204,7 @@ BOOST_AUTO_TEST_CASE(rsm_simple_tests_perf)
     }
     std::chrono::steady_clock::time_point endTime_2 = GetTimeNow();
     int64_t duration_2 = GetDuration(startTime_2, endTime_2);
-    printf("rsm_lock_shared_unlock_shared took %" PRId64 " microseconds \n", duration_2);
+    printf("LW lock_shared_unlock_shared took %" PRId64 " microseconds \n", duration_2);
 
     std::chrono::steady_clock::time_point startTime_3 = GetTimeNow();
     for (run = 0; run < 100000; ++run)
@@ -213,7 +213,7 @@ BOOST_AUTO_TEST_CASE(rsm_simple_tests_perf)
     }
     std::chrono::steady_clock::time_point endTime_3 = GetTimeNow();
     int64_t duration_3 = GetDuration(startTime_3, endTime_3);
-    printf("rsm_try_lock took %" PRId64 " microseconds \n", duration_3);
+    printf("LW try_lock took %" PRId64 " microseconds \n", duration_3);
 
     std::chrono::steady_clock::time_point startTime_4 = GetTimeNow();
     for (run = 0; run < 100000; ++run)
@@ -222,7 +222,7 @@ BOOST_AUTO_TEST_CASE(rsm_simple_tests_perf)
     }
     std::chrono::steady_clock::time_point endTime_4 = GetTimeNow();
     int64_t duration_4 = GetDuration(startTime_4, endTime_4);
-    printf("rsm_try_lock_shared took %" PRId64 " microseconds \n", duration_4);
+    printf("LW try_lock_shared took %" PRId64 " microseconds \n", duration_4);
 
     std::chrono::steady_clock::time_point startTime_5 = GetTimeNow();
     for (run = 0; run < 10000; ++run)
@@ -231,7 +231,7 @@ BOOST_AUTO_TEST_CASE(rsm_simple_tests_perf)
     }
     std::chrono::steady_clock::time_point endTime_5 = GetTimeNow();
     int64_t duration_5 = GetDuration(startTime_5, endTime_5);
-    printf("rsm_100_lock_test took %" PRId64 " microseconds \n", duration_5);
+    printf("LW 100_lock_test took %" PRId64 " microseconds \n", duration_5);
 }
 
 

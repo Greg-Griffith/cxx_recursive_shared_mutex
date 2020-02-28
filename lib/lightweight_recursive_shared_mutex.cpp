@@ -3,75 +3,65 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "include/recursive_shared_mutex.h"
+#include "include/lightweight_recursive_shared_mutex.h"
 
 ////////////////////////
 ///
 /// Private Functions
 ///
 
-bool recursive_shared_mutex::end_of_exclusive_ownership()
+bool lightweight_recursive_shared_mutex::end_of_exclusive_ownership()
 {
     return (_shared_while_exclusive_counter == 0 && _write_counter == 0);
 }
 
-bool recursive_shared_mutex::check_for_write_lock(const std::thread::id &locking_thread_id)
+bool lightweight_recursive_shared_mutex::check_for_write_lock(const std::thread::id &locking_thread_id)
 {
     return (_write_owner_id == locking_thread_id);
 }
 
-bool recursive_shared_mutex::check_for_write_unlock(const std::thread::id &locking_thread_id)
+bool lightweight_recursive_shared_mutex::check_for_write_unlock(const std::thread::id &locking_thread_id)
 {
-    if (_write_owner_id == locking_thread_id)
+    if (_write_owner_id != locking_thread_id)
     {
-        if (_shared_while_exclusive_counter == 0)
-        {
+        return false;
+    }
 #ifdef RSM_DEBUG_ASSERTION
-            throw std::logic_error("can not unlock_shared more times than we locked for shared ownership while holding "
-                                   "exclusive ownership");
-#else
-            return true;
+    if (_shared_while_exclusive_counter == 0)
+    {
+        throw std::logic_error("can not unlock_shared more times than we locked for shared ownership while holding "
+                               "exclusive ownership");
+    }
 #endif
-        }
-        return true;
-    }
-    return false;
+    return true;
 }
 
-bool recursive_shared_mutex::already_has_lock_shared(const std::thread::id &locking_thread_id)
+bool lightweight_recursive_shared_mutex::already_has_lock_shared(const std::thread::id &locking_thread_id)
 {
-    return (_read_owner_ids.find(locking_thread_id) != _read_owner_ids.end());
+    auto it = std::find(_read_owner_ids.begin(), _read_owner_ids.end(), locking_thread_id);
+    return (it != _read_owner_ids.end());
 }
 
-void recursive_shared_mutex::lock_shared_internal(const std::thread::id &locking_thread_id, const uint64_t &count)
+void lightweight_recursive_shared_mutex::lock_shared_internal(const std::thread::id &locking_thread_id)
 {
-    auto it = _read_owner_ids.find(locking_thread_id);
-    if (it == _read_owner_ids.end())
-    {
-        _read_owner_ids.emplace(locking_thread_id, count);
-    }
-    else
-    {
-        it->second = it->second + count;
-    }
+    _read_owner_ids.emplace_back(locking_thread_id);
 }
 
-void recursive_shared_mutex::unlock_shared_internal(const std::thread::id &locking_thread_id, const uint64_t &count)
+void lightweight_recursive_shared_mutex::unlock_shared_internal(const std::thread::id &locking_thread_id)
 {
-    auto it = _read_owner_ids.find(locking_thread_id);
-    if (it == _read_owner_ids.end())
-    {
-#ifdef RSM_DEBUG_ASSERTION
-        throw std::logic_error("can not unlock_shared more times than we locked for shared ownership");
-#else
-        return;
-#endif
-    }
-    it->second = it->second - count;
-    if (it->second == 0)
+    auto it = std::find(_read_owner_ids.begin(), _read_owner_ids.end(), locking_thread_id);
+    if (it != _read_owner_ids.end())
     {
         _read_owner_ids.erase(it);
     }
+#ifdef RSM_DEBUG_ASSERTION
+    else
+    {
+        throw std::logic_error("can not unlock_shared more times than we locked for shared ownership");
+    }
+#endif
+    return;
+
 }
 
 ////////////////////////
@@ -79,7 +69,7 @@ void recursive_shared_mutex::unlock_shared_internal(const std::thread::id &locki
 /// Public Functions
 ///
 
-void recursive_shared_mutex::lock()
+void lightweight_recursive_shared_mutex::lock()
 {
     const std::thread::id &locking_thread_id = std::this_thread::get_id();
     std::unique_lock<std::mutex> _lock(_mutex);
@@ -100,7 +90,7 @@ void recursive_shared_mutex::lock()
     }
 }
 
-bool recursive_shared_mutex::try_lock()
+bool lightweight_recursive_shared_mutex::try_lock()
 {
     const std::thread::id &locking_thread_id = std::this_thread::get_id();
     std::unique_lock<std::mutex> _lock(_mutex, std::try_to_lock);
@@ -119,7 +109,7 @@ bool recursive_shared_mutex::try_lock()
     return false;
 }
 
-void recursive_shared_mutex::unlock()
+void lightweight_recursive_shared_mutex::unlock()
 {
     const std::thread::id &locking_thread_id = std::this_thread::get_id();
     std::lock_guard<std::mutex> _lock(_mutex);
@@ -144,7 +134,7 @@ void recursive_shared_mutex::unlock()
     }
 }
 
-void recursive_shared_mutex::lock_shared()
+void lightweight_recursive_shared_mutex::lock_shared()
 {
     const std::thread::id &locking_thread_id = std::this_thread::get_id();
     std::unique_lock<std::mutex> _lock(_mutex);
@@ -165,7 +155,7 @@ void recursive_shared_mutex::lock_shared()
     }
 }
 
-bool recursive_shared_mutex::try_lock_shared()
+bool lightweight_recursive_shared_mutex::try_lock_shared()
 {
     const std::thread::id &locking_thread_id = std::this_thread::get_id();
     std::unique_lock<std::mutex> _lock(_mutex, std::try_to_lock);
@@ -191,7 +181,7 @@ bool recursive_shared_mutex::try_lock_shared()
     return false;
 }
 
-void recursive_shared_mutex::unlock_shared()
+void lightweight_recursive_shared_mutex::unlock_shared()
 {
     const std::thread::id &locking_thread_id = std::this_thread::get_id();
     std::lock_guard<std::mutex> _lock(_mutex);

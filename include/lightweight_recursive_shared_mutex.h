@@ -6,16 +6,17 @@
 #ifndef _RECURSIVE_SHARED_MUTEX_H
 #define _RECURSIVE_SHARED_MUTEX_H
 
+#include <algorithm>
 #include <cassert>
 #include <chrono>
 #include <condition_variable>
 #include <exception>
-#include <map>
 #include <mutex>
 #include <system_error>
 #include <thread>
 #include <tuple>
 #include <type_traits>
+#include <vector>
 
 
 /**
@@ -32,7 +33,7 @@
 
 static const std::thread::id NON_THREAD_ID = std::thread::id();
 
-class recursive_shared_mutex
+class lightweight_recursive_shared_mutex
 {
 protected:
     // Only locked when accessing counters, ids, or waiting on condition variables.
@@ -45,7 +46,7 @@ protected:
     std::condition_variable _write_gate;
 
     // holds a list of owner ids that have shared ownership and the number of times they locked it
-    std::map<std::thread::id, uint64_t> _read_owner_ids;
+    std::vector<std::thread::id> _read_owner_ids;
 
     // holds the number of shared locks the thread with exclusive ownership has
     // this is used to allow the thread with exclusive ownership to lock_shared
@@ -62,11 +63,11 @@ private:
     bool check_for_write_unlock(const std::thread::id &locking_thread_id);
 
     bool already_has_lock_shared(const std::thread::id &locking_thread_id);
-    void lock_shared_internal(const std::thread::id &locking_thread_id, const uint64_t &count = 1);
-    void unlock_shared_internal(const std::thread::id &locking_thread_id, const uint64_t &count = 1);
+    void lock_shared_internal(const std::thread::id &locking_thread_id);
+    void unlock_shared_internal(const std::thread::id &locking_thread_id);
 
 public:
-    recursive_shared_mutex()
+    lightweight_recursive_shared_mutex()
     {
         _read_owner_ids.clear();
         _write_counter = 0;
@@ -74,9 +75,9 @@ public:
         _write_owner_id = NON_THREAD_ID;
     }
 
-    ~recursive_shared_mutex() {}
-    recursive_shared_mutex(const recursive_shared_mutex &) = delete;
-    recursive_shared_mutex &operator=(const recursive_shared_mutex &) = delete;
+    ~lightweight_recursive_shared_mutex() {}
+    lightweight_recursive_shared_mutex(const lightweight_recursive_shared_mutex &) = delete;
+    lightweight_recursive_shared_mutex &operator=(const lightweight_recursive_shared_mutex &) = delete;
 
     /**
      * "Wait in line" for exclusive ownership of the mutex.
