@@ -1,12 +1,10 @@
 ACLOCAL_AMFLAGS = -I build-aux/m4
 
 include_HEADERS = \
-	include/lightweight_recursive_shared_mutex.h \
 	include/promotable_recursive_shared_mutex.h \
 	include/recursive_shared_mutex.h
 
 librsm_la_SOURCES = \
-	lib/lightweight_recursive_shared_mutex.cpp \
 	lib/promotable_recursive_shared_mutex.cpp \
 	lib/recursive_shared_mutex.cpp \
 	$(include_HEADERS)
@@ -26,8 +24,6 @@ bin_PROGRAMS = test/test_rsm
 TEST_BINARY = test/test_rsm$(EXEEXT)
 
 test_test_rsm_SOURCES = test/test_cxx_rsm.cpp \
-	test/lightweight_rsm/promotion_tests.cpp \
-	test/lightweight_rsm/simple_tests.cpp \
 	test/rsm/promotion_tests.cpp \
 	test/rsm/simple_tests.cpp \
 	test/promotable_rsm/promotion_tests.cpp \
