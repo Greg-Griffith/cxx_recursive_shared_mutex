@@ -4,8 +4,8 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "exp_recursive_shared_mutex.h"
-#include "test_cxx_rsm.h"
-#include "timer.h"
+#include "test/test_cxx_rsm.h"
+#include "test/timer.h"
 
 #include <boost/test/unit_test.hpp>
 
