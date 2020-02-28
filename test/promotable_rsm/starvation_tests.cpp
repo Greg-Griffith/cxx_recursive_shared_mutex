@@ -126,6 +126,7 @@ BOOST_AUTO_TEST_CASE(rsm_starvation_test)
     rsm_test_starvation();
 }
 
+#ifdef RSM_BENCHMARK
 BOOST_AUTO_TEST_CASE(rsm_test_starvation_perf)
 {
     uint32_t run = 0;
@@ -138,5 +139,6 @@ BOOST_AUTO_TEST_CASE(rsm_test_starvation_perf)
     int64_t duration_1 = GetDuration(startTime_1, endTime_1);
     printf("PRO test_starvation took %" PRId64 " microseconds \n", duration_1);
 }
+#endif
 
 BOOST_AUTO_TEST_SUITE_END()

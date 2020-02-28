@@ -185,6 +185,7 @@ BOOST_AUTO_TEST_CASE(rsm_simple_tests)
     rsm_100_lock_test();
 }
 
+#ifdef RSM_BENCHMARK
 BOOST_AUTO_TEST_CASE(rsm_simple_tests_perf)
 {
     uint32_t run = 0;
@@ -233,6 +234,6 @@ BOOST_AUTO_TEST_CASE(rsm_simple_tests_perf)
     int64_t duration_5 = GetDuration(startTime_5, endTime_5);
     printf("rsm_100_lock_test took %" PRId64 " microseconds \n", duration_5);
 }
-
+#endif
 
 BOOST_AUTO_TEST_SUITE_END()

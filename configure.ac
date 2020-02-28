@@ -44,8 +44,17 @@ AC_ARG_ENABLE(tests,
     [use_tests=$enableval],
     [use_tests=yes])
 
+AC_ARG_ENABLE(benchmark,
+    AS_HELP_STRING([--enable-benchmark],[compile benchmark tests (default is not to compile)]),
+    [enable_benchmark=$enableval],
+    [enable_benchmark=no])
+
 if test "x$enable_debug" = xyes; then
     CPPFLAGS="$CPPFLAGS -DRSM_DEBUG_ASSERTION"
+fi
+
+if test "x$enable_benchmark" = xyes; then
+    CPPFLAGS="$CPPFLAGS -DRSM_BENCHMARK"
 fi
 
 case $host in
