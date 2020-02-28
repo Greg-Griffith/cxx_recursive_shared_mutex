@@ -75,6 +75,7 @@ BOOST_AUTO_TEST_CASE(rsm_promotion_tests)
     rsm_lock_shared_while_exclusive_owner();
 }
 
+#ifdef RSM_BENCHMARK
 BOOST_AUTO_TEST_CASE(rsm_promotion_tests_perf)
 {
     uint32_t run = 0;
@@ -87,5 +88,6 @@ BOOST_AUTO_TEST_CASE(rsm_promotion_tests_perf)
     int64_t duration_1 = GetDuration(startTime_1, endTime_1);
     printf("rsm_lock_shared_while_exclusive_owner took %" PRId64 " microseconds \n", duration_1);
 }
+#endif
 
 BOOST_AUTO_TEST_SUITE_END()

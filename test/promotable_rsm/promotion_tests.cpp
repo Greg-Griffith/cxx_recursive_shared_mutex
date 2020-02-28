@@ -131,6 +131,7 @@ BOOST_AUTO_TEST_CASE(rsm_promotion_tests)
     rsm_try_promotion();
 }
 
+#ifdef RSM_BENCHMARK
 BOOST_AUTO_TEST_CASE(rsm_promotion_tests_perf)
 {
     uint32_t run = 0;
@@ -156,5 +157,6 @@ BOOST_AUTO_TEST_CASE(rsm_promotion_tests_perf)
     int64_t duration_2 = GetDuration(startTime_2, endTime_2);
     printf("PRO try_promotion took %" PRId64 " microseconds \n", duration_2);
 }
+#endif
 
 BOOST_AUTO_TEST_SUITE_END()
