@@ -16,8 +16,8 @@ CLEANFILES = lib/*.gcda lib/*.gcno
 exp_test_files =
 
 if ENABLE_EXPERIMENTAL
-librsm_exp_la_SOURCES = lib/experimental/exp_recursive_shared_mutex.cpp \
-	lib/experimental/exp_recursive_shared_mutex.h
+librsm_exp_la_SOURCES = experimental/exp_recursive_shared_mutex.cpp \
+	experimental/exp_recursive_shared_mutex.h
 
 librsm_exp_la_LDFLAGS = $(AM_LDFLAGS) -no-undefined $(RELDFLAGS)
 librsm_exp_la_CPPFLAGS = $(AM_CPPFLAGS)
@@ -26,9 +26,9 @@ librsm_exp_la_CXXFLAGS = $(AM_CXXFLAGS)
 lib_LTLIBRARIES += librsm_exp.la
 
 exp_test_files += \
-	test/experimental/exp_rsm_promotion_tests.cpp \
-	test/experimental/exp_rsm_simple_tests.cpp \
-	test/experimental/exp_rsm_starvation_tests.cpp \
+	experimental/test/exp_rsm_promotion_tests.cpp \
+	experimental/test/exp_rsm_simple_tests.cpp \
+	experimental/test/exp_rsm_starvation_tests.cpp \
 	$(librsm_exp_la_SOURCES)
 
 CLEANFILES += lib/experimental/*.gcda lib/experimental/*.gcno
@@ -51,7 +51,7 @@ test_test_rsm_SOURCES = test/test_cxx_rsm.cpp \
 test_test_rsm_CPPFLAGS = $(AM_CPPFLAGS) $(BOOST_CPPFLAGS) $(TESTDEFS)
 test_test_rsm_CXXFLAGS = $(AM_CXXFLAGS) -I$(top_srcdir)/include -pthread
 if ENABLE_EXPERIMENTAL
-test_test_rsm_CXXFLAGS += -I$(top_srcdir)/lib/experimental -I$(top_srcdir)/test
+test_test_rsm_CXXFLAGS += -I$(top_srcdir)/experimental -I$(top_srcdir)/experimental/test
 endif
 test_test_rsm_LDFLAGS = -static $(LIBTOOL_APP_LDFLAGS)
 test_test_rsm_LDADD = $(BOOST_LIBS)
