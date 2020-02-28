@@ -44,11 +44,6 @@ AC_ARG_ENABLE(tests,
     [use_tests=$enableval],
     [use_tests=yes])
 
-AC_ARG_ENABLE(experimental,
-    AS_HELP_STRING([--enable-experimental],[compile experimental branch and tests (default is not to compile)]),
-    [enable_experimental=$enableval],
-    [enable_experimental=no])
-
 if test "x$enable_debug" = xyes; then
     CPPFLAGS="$CPPFLAGS -DRSM_DEBUG_ASSERTION"
 fi
@@ -104,19 +99,9 @@ else
   BUILD_TEST=""
 fi
 
-AC_MSG_CHECKING([whether to build experimental code])
-if test x$enable_experimental = xyes; then
-  AC_MSG_RESULT([yes])
-  BUILD_EXPERIMENTAL="yes"
-else
-  AC_MSG_RESULT([no])
-  BUILD_EXPERIMENTAL=""
-fi
-
 AC_CONFIG_FILES([Makefile])
 
 AM_CONDITIONAL([ENABLE_TESTS],[test x$BUILD_TEST = xyes])
-AM_CONDITIONAL([ENABLE_EXPERIMENTAL],[test x$BUILD_EXPERIMENTAL = xyes])
 
 AC_SUBST(LIBTOOL_APP_LDFLAGS)
 AC_SUBST(RELDFLAGS)
