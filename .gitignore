@@ -34,5 +34,4 @@ rsm-config.h*
 .dirstamp
 *.o
 test_rsm
-lib/experimental/*lo
 librsm_exp.la
