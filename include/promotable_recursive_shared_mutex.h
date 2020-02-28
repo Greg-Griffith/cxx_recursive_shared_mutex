@@ -32,7 +32,7 @@
 
 static const std::thread::id NON_THREAD_ID = std::thread::id();
 
-class recursive_shared_mutex
+class promotable_recursive_shared_mutex
 {
 protected:
     // Only locked when accessing counters, ids, or waiting on condition variables.
@@ -43,6 +43,9 @@ protected:
 
     // the write_gate is locked (blocked) when threads have read ownership or someone is waiting for promotion
     std::condition_variable _write_gate;
+
+    // // the write_gate is locked (blocked) when threads have read ownership
+    std::condition_variable _promotion_write_gate;
 
     // holds a list of owner ids that have shared ownership and the number of times they locked it
     std::map<std::thread::id, uint64_t> _read_owner_ids;
@@ -55,6 +58,11 @@ protected:
     uint64_t _write_counter;
     // _write_owner_id is the id of the thread with exclusive ownership
     std::thread::id _write_owner_id;
+    // _promotion_candidate_id is the id of the thread waiting for a promotion
+    std::thread::id _promotion_candidate_id;
+
+    // used to keep track of normal thread exclusive line if a thread has promoted
+    uint64_t _write_counter_reserve;
 
 private:
     bool end_of_exclusive_ownership();
@@ -66,17 +74,19 @@ private:
     void unlock_shared_internal(const std::thread::id &locking_thread_id, const uint64_t &count = 1);
 
 public:
-    recursive_shared_mutex()
+    promotable_recursive_shared_mutex()
     {
         _read_owner_ids.clear();
         _write_counter = 0;
         _shared_while_exclusive_counter = 0;
         _write_owner_id = NON_THREAD_ID;
+        _promotion_candidate_id = NON_THREAD_ID;
+        _write_counter_reserve = 0;
     }
 
-    ~recursive_shared_mutex() {}
-    recursive_shared_mutex(const recursive_shared_mutex &) = delete;
-    recursive_shared_mutex &operator=(const recursive_shared_mutex &) = delete;
+    ~promotable_recursive_shared_mutex() {}
+    promotable_recursive_shared_mutex(const promotable_recursive_shared_mutex &) = delete;
+    promotable_recursive_shared_mutex &operator=(const promotable_recursive_shared_mutex &) = delete;
 
     /**
      * "Wait in line" for exclusive ownership of the mutex.
@@ -92,6 +102,26 @@ public:
      * @return none
      */
     void lock();
+
+    /**
+     * Become "next in line" for exclusive ownership of the mutex if the promotion
+     * slot is not already occupied by another thread.
+     *
+     * When called by a thread that has shared ownership or no ownership, attempt to
+     * obtain the promotion slot. Only one thread can hold the promotion slot at a time.
+     * While promotion slot is obtained and waiting for exclusive ownership this
+     * call is blocking.
+     * When called by a thread that already has exclusive ownership,
+     * _write_counter is incremeneted by 1 and call does not block
+     *
+     *
+     * @param none
+     * @return: false on failure to be put in the promotion slot because
+     * it is already occupied by another thread.
+     * true when _write_counter has been incremented or exclusive ownership has been
+     * obtained
+     */
+    bool try_promotion();
 
     /**
      * Attempt to claim exclusive ownership of the mutex if no threads

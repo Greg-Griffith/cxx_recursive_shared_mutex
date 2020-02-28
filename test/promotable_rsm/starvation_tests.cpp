@@ -3,15 +3,15 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "recursive_shared_mutex.h"
-#include "test_cxx_rsm.h"
-#include "timer.h"
+#include "promotable_recursive_shared_mutex.h"
+#include "test/test_cxx_rsm.h"
+#include "test/timer.h"
 
 #include <boost/test/unit_test.hpp>
 
-BOOST_FIXTURE_TEST_SUITE(rsm_starvation_tests, TestSetup)
+BOOST_FIXTURE_TEST_SUITE(promotable_starvation_tests, TestSetup)
 
-class rsm_watcher : public recursive_shared_mutex
+class rsm_watcher : public promotable_recursive_shared_mutex
 {
 public:
     size_t get_shared_owners_count() { return _read_owner_ids.size(); }
@@ -136,7 +136,7 @@ BOOST_AUTO_TEST_CASE(rsm_test_starvation_perf)
     }
     std::chrono::steady_clock::time_point endTime_1 = GetTimeNow();
     int64_t duration_1 = GetDuration(startTime_1, endTime_1);
-    printf("rsm_test_starvation took %" PRId64 " microseconds \n", duration_1);
+    printf("PRO test_starvation took %" PRId64 " microseconds \n", duration_1);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
