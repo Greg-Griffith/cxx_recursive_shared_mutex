@@ -10,12 +10,12 @@
 #include <chrono>
 #include <condition_variable>
 #include <exception>
-#include <map>
 #include <mutex>
 #include <system_error>
 #include <thread>
 #include <tuple>
 #include <type_traits>
+#include <vector>
 
 
 /**
@@ -45,7 +45,8 @@ protected:
     std::condition_variable _write_gate;
 
     // holds a list of owner ids that have shared ownership and the number of times they locked it
-    std::map<std::thread::id, uint64_t> _read_owner_ids;
+    std::vector<std::thread::id>_read_owner_ids;
+    std::vector<uint64_t>_read_owner_values;
 
     // holds the number of shared locks the thread with exclusive ownership has
     // this is used to allow the thread with exclusive ownership to lock_shared
@@ -68,7 +69,7 @@ private:
 public:
     recursive_shared_mutex()
     {
-        _read_owner_ids.clear();
+        _read_owner_ids.reserve(15);
         _write_counter = 0;
         _shared_while_exclusive_counter = 0;
         _write_owner_id = NON_THREAD_ID;
