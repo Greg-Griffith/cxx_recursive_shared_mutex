@@ -5,6 +5,8 @@
 
 #include "include/recursive_shared_mutex.h"
 
+#include <algorithm>
+
 ////////////////////////
 ///
 /// Private Functions
@@ -40,25 +42,26 @@ bool recursive_shared_mutex::check_for_write_unlock(const std::thread::id &locki
 
 bool recursive_shared_mutex::already_has_lock_shared(const std::thread::id &locking_thread_id)
 {
-    return (_read_owner_ids.find(locking_thread_id) != _read_owner_ids.end());
+    return (std::find(_read_owner_ids.begin(), _read_owner_ids.end(), locking_thread_id) != _read_owner_ids.end());
 }
 
 void recursive_shared_mutex::lock_shared_internal(const std::thread::id &locking_thread_id, const uint64_t &count)
 {
-    auto it = _read_owner_ids.find(locking_thread_id);
+    auto it = std::find(_read_owner_ids.begin(), _read_owner_ids.end(), locking_thread_id);
     if (it == _read_owner_ids.end())
     {
-        _read_owner_ids.emplace(locking_thread_id, count);
+        _read_owner_ids.emplace_back(locking_thread_id);
+        _read_owner_values.emplace_back(count);
     }
     else
     {
-        it->second = it->second + count;
+        _read_owner_values[it - _read_owner_ids.begin()] += count;
     }
 }
 
 void recursive_shared_mutex::unlock_shared_internal(const std::thread::id &locking_thread_id, const uint64_t &count)
 {
-    auto it = _read_owner_ids.find(locking_thread_id);
+    auto it = std::find(_read_owner_ids.begin(), _read_owner_ids.end(), locking_thread_id);
     if (it == _read_owner_ids.end())
     {
 #ifdef RSM_DEBUG_ASSERTION
@@ -67,10 +70,11 @@ void recursive_shared_mutex::unlock_shared_internal(const std::thread::id &locki
         return;
 #endif
     }
-    it->second = it->second - count;
-    if (it->second == 0)
+    _read_owner_values[it - _read_owner_ids.begin()] -= count;
+    if (_read_owner_values[it - _read_owner_ids.begin()] == 0)
     {
         _read_owner_ids.erase(it);
+        _read_owner_values.erase(_read_owner_values.begin() + (it - _read_owner_ids.begin()));
     }
 }
 
